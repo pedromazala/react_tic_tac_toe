@@ -5,34 +5,34 @@ import React from 'react';
 
 import {Board} from './Board';
 
-function uniqueArray(notUniqueArray) {
-    return notUniqueArray.filter((v, i, a) => a.indexOf(v) === i);
-}
+Array.prototype.unique = function() {
+    return this.filter((v, i, a) => a.indexOf(v) === i);
+};
 
-function notNullArrayValues(arrayWithNulls) {
-    return arrayWithNulls.filter((v, i, a) => v);
-}
+Array.prototype.notEmptyValues = function() {
+    return this.filter((v, i, a) => v);
+};
 
-function rotateArray(array) {
-    return array[0].map((x, i) => array.map(x => x[i]));
-}
+Array.prototype.mutate = function() {
+    return this[0].map((x, i) => this.map(x => x[i]));
+};
 
-function diagonalArray(array, type = 0) {
-    let newArray = new Array(array.length).fill(null);
+Array.prototype.diagonal = function(type) {
+    let newArray = new Array(this.length).fill(null);
 
-    for (let i = 0, j = array.length - 1; i < array.length; i++, j--) {
-        newArray[i] = array[i][i];
+    for (let i = 0, j = this.length - 1; i < this.length; i++, j--) {
+        newArray[i] = this[i][i];
         if (type) {
-            newArray[i] = array[i][j];
+            newArray[i] = this[i][j];
         }
     }
     return newArray;
-}
+};
 
 function calculateWinner(squares) {
     const squareTests = [
         squares,
-        rotateArray(squares)
+        squares.mutate()
     ];
     for (let i in squareTests) {
         if (!squareTests.hasOwnProperty(i)) {
@@ -40,29 +40,29 @@ function calculateWinner(squares) {
         }
 
         const tests = squareTests[i].map((uniDimensional) => {
-            const unique = uniqueArray(uniDimensional);
+            const unique = uniDimensional.unique();
             if (unique.length === 1) {
                 return unique[0];
             }
 
             return null;
         });
-        const result = uniqueArray(notNullArrayValues(tests));
+        const result = tests.notEmptyValues().unique();
         if (result.length === 1) {
             return result[0];
         }
     }
 
     const diagonals = [
-        diagonalArray(squares),
-        diagonalArray(squares, 1)
+        squares.diagonal(),
+        squares.diagonal(1)
     ];
     for (let i in diagonals) {
         if (!diagonals.hasOwnProperty(i)) {
             continue;
         }
 
-        const diagonalResult = uniqueArray(diagonals[i]);
+        const diagonalResult = diagonals[i].unique();
         if (diagonalResult.length === 1) {
             return diagonalResult[0];
         }
