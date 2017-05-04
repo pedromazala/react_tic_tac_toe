@@ -30,43 +30,42 @@ function diagonalArray(array, type = 0) {
 }
 
 function calculateWinner(squares) {
-    const lines = squares.map((column) => {
-        const unique = uniqueArray(column);
-        if (unique.length === 1) {
-            return unique[0];
+    const squareTests = [
+        squares,
+        rotateArray(squares)
+    ];
+    for (let i in squareTests) {
+        if (!squareTests.hasOwnProperty(i)) {
+            continue;
         }
 
-        return null;
-    });
-    const linesResult = uniqueArray(notNullArrayValues(lines));
-    if (linesResult.length === 1) {
-        return linesResult[0];
+        const tests = squareTests[i].map((uniDimensional) => {
+            const unique = uniqueArray(uniDimensional);
+            if (unique.length === 1) {
+                return unique[0];
+            }
+
+            return null;
+        });
+        const result = uniqueArray(notNullArrayValues(tests));
+        if (result.length === 1) {
+            return result[0];
+        }
     }
 
-    const columns = rotateArray(squares).map((line) => {
-        const unique = uniqueArray(line);
-        if (unique.length === 1) {
-            return unique[0];
+    const diagonals = [
+        diagonalArray(squares),
+        diagonalArray(squares, 1)
+    ];
+    for (let i in diagonals) {
+        if (!diagonals.hasOwnProperty(i)) {
+            continue;
         }
 
-        return null;
-    });
-    const columnsResult = uniqueArray(notNullArrayValues(columns));
-    if (columnsResult.length === 1) {
-        return columnsResult[0];
-    }
-
-    const diagonal1 = diagonalArray(squares);
-    const diagonal1Result = uniqueArray(diagonal1);
-    if (diagonal1Result.length === 1) {
-        return diagonal1Result[0];
-    }
-
-    const diagonal2 = diagonalArray(squares, 1);
-    console.log(diagonal2);
-    const diagonal2Result = uniqueArray(diagonal2);
-    if (diagonal2Result.length === 1) {
-        return diagonal2Result[0];
+        const diagonalResult = uniqueArray(diagonals[i]);
+        if (diagonalResult.length === 1) {
+            return diagonalResult[0];
+        }
     }
 
     return null;
@@ -85,12 +84,16 @@ export class Game extends React.Component {
     }
 
     jumpTo(move) {
+        if (move === this.state.history.length - 1) {
+            return;
+        }
         const history = this.state.history.slice(0, move + 1);
         const current = history[history.length - 1];
 
+        console.log(current);
         this.setState({
             history: history,
-            xIsNext: !current.xIsNext
+            xIsNext: (history.length === 1 ? current.xIsNext : !current.xIsNext)
         });
     }
 
